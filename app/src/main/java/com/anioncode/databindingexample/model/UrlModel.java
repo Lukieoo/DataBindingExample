@@ -1,6 +1,5 @@
-package com.anioncode.databindingexample.Model;
+package com.anioncode.databindingexample.model;
 
-import java.io.Serializable;
 import com.google.gson.annotations.SerializedName;
 
 public class UrlModel  {

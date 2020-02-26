@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="image"
+            type="com.anioncode.databindingexample.model.ImageModel"/>
+        <variable name="handlers" type="com.anioncode.databindingexample.binding.Handlers"/>
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:elevation="10dp"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:cardCornerRadius="20dp">
+
+        <RelativeLayout
+
+            android:onClick="@{(view) -> handlers.onClickPressed(view, image)}"
+            android:id="@+id/screen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+
+                android:id="@+id/Photo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                tools:image="@{image.urls.regular}"
+                />
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:layout_margin="5dp"
+                android:background="@drawable/ic_star"
+                android:backgroundTint="#fbc02d"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:text="@{image.likes}"
+                android:textColor="@android:color/white"
+                android:textSize="10sp" />
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

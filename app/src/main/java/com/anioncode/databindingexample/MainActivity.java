@@ -1,70 +1,62 @@
 package com.anioncode.databindingexample;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.widget.TextView;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
-import com.anioncode.databindingexample.Connection.ApiConnect;
-import com.anioncode.databindingexample.Connection.GetRetrofit;
-import com.anioncode.databindingexample.Connection.RetrofitClientInstance;
-import com.anioncode.databindingexample.Model.ImageModel;
+import com.anioncode.databindingexample.binding.Handlers;
+import com.anioncode.databindingexample.binding.ImageDataAdapterView;
+import com.anioncode.databindingexample.binding.MainViewModelView;
+import com.anioncode.databindingexample.model.ImageModel;
+import com.anioncode.databindingexample.databinding.ActivityMainBinding;
 
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ArrayList<ImageModel> datas = new ArrayList<>();
-
+    private MainViewModelView mainViewModel;
+    private ImageDataAdapterView adapterView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        Window w = getWindow();
+        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        ActivityMainBinding activityMainBinding =
+                DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        GetRetrofit service = RetrofitClientInstance.getRetrofitInstance().create(GetRetrofit.class);
-        Call<ApiConnect> call = service.getAdminQuestions();
-        call.enqueue(new Callback<ApiConnect>() {
-            @Override
-            public void onResponse(Call<ApiConnect> call, Response<ApiConnect> response) {
-//                mSwipeRefreshLayout.setRefreshing(false);
-                //finally we are setting the list to our MutableLiveData
+        // bind RecyclerView
+        RecyclerView recyclerView = activityMainBinding.RecyclerView;
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerView.setHasFixedSize(true);
 
-                ApiConnect jsonResponse = response.body();
-                if (jsonResponse != null && jsonResponse.getApi() != null) {
+        mainViewModel = ViewModelProviders.of(this).get(MainViewModelView.class);
+        adapterView = new ImageDataAdapterView();
+        recyclerView.setAdapter(adapterView);
 
-                    datas = new ArrayList<>(Arrays.asList(jsonResponse.getApi()));
-                    System.out.println(jsonResponse.toString());
-                //    heroList.setValue(datas);
 
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<ApiConnect> call, Throwable t) {
-            }
-        });
+        getAllImage();
 
     }
-
+    private void getAllImage() {
+        mainViewModel.getAllEmployee().observe(this, new Observer<List<ImageModel>>() {
+            @Override
+            public void onChanged(@Nullable List<ImageModel> imageModels) {
+                adapterView.setEmployeeList((ArrayList<ImageModel>) imageModels);
+            }
+        });
+    }
 }
